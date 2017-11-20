@@ -17,9 +17,9 @@ var RootCmd = &cobra.Command{
 	Long: "Hello server ",
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("server is running on Port: ",port)
-	},
+	//Run: func(cmd *cobra.Command, args []string) {
+	//	fmt.Println("server is running on Port: ",port)
+	//},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
