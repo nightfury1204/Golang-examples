@@ -1,24 +1,23 @@
-
-
 package cmd
 
 import (
-	"fmt"
-	"github.com/spf13/cobra"
-	"net/http"
-	"log"
-	"strconv"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"log"
+	"net/http"
+	"strconv"
+
+	"github.com/spf13/cobra"
 )
 
 // serveCmd represents the serve command
 var helloCmd = &cobra.Command{
 	Use:   "hello",
 	Short: "start server and say hello",
-	Long: "This command will start the server on specified port(default port is 8080) and say hello",
+	Long:  "This command will start the server on specified port(default port is 8080) and say hello",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("Server is starting on port: %v....\n",port)
+		fmt.Printf("Server is starting on port: %v....\n", port)
 		runEchoServer()
 	},
 }
@@ -37,14 +36,14 @@ func init() {
 	// serveCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func runEchoServer(){
+func runEchoServer() {
 	server := &http.Server{
-		Addr : ":"+port,
+		Addr: ":" + port,
 	}
 
-	http.HandleFunc("/hello",func(wr http.ResponseWriter, rd *http.Request){
+	http.HandleFunc("/hello", func(wr http.ResponseWriter, rd *http.Request) {
 
-		type userInfo struct{
+		type userInfo struct {
 			Name string
 			Age  int
 		}
@@ -53,48 +52,46 @@ func runEchoServer(){
 
 			var user userInfo
 
-			nameValue,nameOk := rd.URL.Query()["name"]
+			nameValue, nameOk := rd.URL.Query()["name"]
 			if nameOk {
 				user.Name = nameValue[0]
 			}
 
-			ageValue,ageOk := rd.URL.Query()["age"]
+			ageValue, ageOk := rd.URL.Query()["age"]
 			if ageOk {
-				if len(ageValue[0])>0 {
-					age,err := strconv.ParseInt(ageValue[0],10,64)
-					if err==nil {
+				if len(ageValue[0]) > 0 {
+					age, err := strconv.ParseInt(ageValue[0], 10, 64)
+					if err == nil {
 						user.Age = int(age)
 					}
 				}
 			}
-			fmt.Fprintln(wr,"Hello,",user.Name)
-			fmt.Fprintln(wr,"Your age is: ",user.Age)
+			fmt.Fprintln(wr, "Hello,", user.Name)
+			fmt.Fprintln(wr, "Your age is: ", user.Age)
 
-		} else if rd.Method=="POST" {
+		} else if rd.Method == "POST" {
 
 			defer rd.Body.Close()
-			info,err := ioutil.ReadAll(rd.Body)
-			if err!=nil {
-				log.Fatal("Error found in json reading::",err)
+			info, err := ioutil.ReadAll(rd.Body)
+			if err != nil {
+				log.Fatal("Error found in json reading::", err)
 			} else {
 				var user userInfo
 				//json to struct
-				err := json.Unmarshal(info,&user)
-				if err!=nil {
-					log.Fatal("Error found in json to struct conversion::",err)
+				err := json.Unmarshal(info, &user)
+				if err != nil {
+					log.Fatal("Error found in json to struct conversion::", err)
 				} else {
-					fmt.Fprintln(wr,"Hello, ",user.Name)
-					fmt.Fprintln(wr,"Your age is: ",user.Age)
+					fmt.Fprintln(wr, "Hello, ", user.Name)
+					fmt.Fprintln(wr, "Your age is: ", user.Age)
 				}
 			}
 		}
 	})
 
-	err:=server.ListenAndServe()
+	err := server.ListenAndServe()
 
-	if err!=nil {
+	if err != nil {
 		log.Fatal(err)
 	}
 }
-
-
