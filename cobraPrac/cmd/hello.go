@@ -13,18 +13,18 @@ import (
 )
 
 // serveCmd represents the serve command
-var serveCmd = &cobra.Command{
-	Use:   "serve",
-	Short: "start the server and output json",
-	Long: "This command will start the server on specified port(default port is 8080) and output name,age in json formate",
+var helloCmd = &cobra.Command{
+	Use:   "hello",
+	Short: "start server and say hello",
+	Long: "This command will start the server on specified port(default port is 8080) and say hello",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("Server is starting on port: %v....\n",port)
-		runServer()
+		runEchoServer()
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(serveCmd)
+	serveCmd.AddCommand(helloCmd)
 
 	// Here you will define your flags and configuration settings.
 
@@ -37,7 +37,7 @@ func init() {
 	// serveCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func runServer(){
+func runEchoServer(){
 	server := &http.Server{
 		Addr : ":"+port,
 	}
@@ -67,13 +67,8 @@ func runServer(){
 					}
 				}
 			}
-			//struct to json
-			userJson,err := json.MarshalIndent(user,"","  ")
-			if err!=nil {
-				log.Fatal("Error found in struct to json conversion::",err)
-			} else {
-				fmt.Fprintln(wr,string(userJson))
-			}
+			fmt.Fprintln(wr,"Hello,",user.Name)
+			fmt.Fprintln(wr,"Your age is: ",user.Age)
 
 		} else if rd.Method=="POST" {
 
@@ -88,13 +83,8 @@ func runServer(){
 				if err!=nil {
 					log.Fatal("Error found in json to struct conversion::",err)
 				} else {
-					//struct to json
-					userJson,err := json.MarshalIndent(user,"","  ")
-					if err!=nil {
-						log.Fatal("Error found in struct to json conversion::",err)
-					} else {
-						fmt.Fprintln(wr,string(userJson))
-					}
+					fmt.Fprintln(wr,"Hello, ",user.Name)
+					fmt.Fprintln(wr,"Your age is: ",user.Age)
 				}
 			}
 		}
