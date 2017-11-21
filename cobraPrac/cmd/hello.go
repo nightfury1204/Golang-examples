@@ -3,10 +3,8 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/spf13/cobra"
 )
@@ -43,48 +41,28 @@ func runEchoServer() {
 
 	http.HandleFunc("/hello", func(wr http.ResponseWriter, rd *http.Request) {
 
-		type userInfo struct {
-			Name string
-			Age  int
-		}
-
 		if rd.Method == "GET" {
 
 			var user userInfo
 
-			nameValue, nameOk := rd.URL.Query()["name"]
-			if nameOk {
-				user.Name = nameValue[0]
+			err := json.Unmarshal([]byte(handleGetRequest(rd)), &user)
+			if err != nil {
+				log.Fatal("Error json to struct::", err)
+			} else {
+				fmt.Fprintln(wr, "Hello,", user.Name)
+				fmt.Fprintln(wr, "Your age is: ", user.Age)
 			}
-
-			ageValue, ageOk := rd.URL.Query()["age"]
-			if ageOk {
-				if len(ageValue[0]) > 0 {
-					age, err := strconv.ParseInt(ageValue[0], 10, 64)
-					if err == nil {
-						user.Age = int(age)
-					}
-				}
-			}
-			fmt.Fprintln(wr, "Hello,", user.Name)
-			fmt.Fprintln(wr, "Your age is: ", user.Age)
 
 		} else if rd.Method == "POST" {
 
-			defer rd.Body.Close()
-			info, err := ioutil.ReadAll(rd.Body)
+			var user userInfo
+
+			err := json.Unmarshal([]byte(handlePostRequest(rd)), &user)
 			if err != nil {
-				log.Fatal("Error found in json reading::", err)
+				log.Fatal("Error json to struct::", err)
 			} else {
-				var user userInfo
-				//json to struct
-				err := json.Unmarshal(info, &user)
-				if err != nil {
-					log.Fatal("Error found in json to struct conversion::", err)
-				} else {
-					fmt.Fprintln(wr, "Hello, ", user.Name)
-					fmt.Fprintln(wr, "Your age is: ", user.Age)
-				}
+				fmt.Fprintln(wr, "Hello,", user.Name)
+				fmt.Fprintln(wr, "Your age is: ", user.Age)
 			}
 		}
 	})

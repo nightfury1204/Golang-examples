@@ -23,6 +23,10 @@ var serveCmd = &cobra.Command{
 	},
 }
 
+type userInfo struct{
+	Name string
+	Age  int
+}
 func init() {
 	RootCmd.AddCommand(serveCmd)
 
@@ -44,59 +48,15 @@ func runServer(){
 
 	http.HandleFunc("/hello",func(wr http.ResponseWriter, rd *http.Request){
 
-		type userInfo struct{
-			Name string
-			Age  int
-		}
-
 		if rd.Method == "GET" {
 
-			var user userInfo
-
-			nameValue,nameOk := rd.URL.Query()["name"]
-			if nameOk {
-				user.Name = nameValue[0]
-			}
-
-			ageValue,ageOk := rd.URL.Query()["age"]
-			if ageOk {
-				if len(ageValue[0])>0 {
-					age,err := strconv.ParseInt(ageValue[0],10,64)
-					if err==nil {
-						user.Age = int(age)
-					}
-				}
-			}
-			//struct to json
-			userJson,err := json.MarshalIndent(user,"","  ")
-			if err!=nil {
-				log.Fatal("Error found in struct to json conversion::",err)
-			} else {
-				fmt.Fprintln(wr,string(userJson))
-			}
+			fmt.Fprintln(wr,handleGetRequest(rd))
+			return
 
 		} else if rd.Method=="POST" {
 
-			defer rd.Body.Close()
-			info,err := ioutil.ReadAll(rd.Body)
-			if err!=nil {
-				log.Fatal("Error found in json reading::",err)
-			} else {
-				var user userInfo
-				//json to struct
-				err := json.Unmarshal(info,&user)
-				if err!=nil {
-					log.Fatal("Error found in json to struct conversion::",err)
-				} else {
-					//struct to json
-					userJson,err := json.MarshalIndent(user,"","  ")
-					if err!=nil {
-						log.Fatal("Error found in struct to json conversion::",err)
-					} else {
-						fmt.Fprintln(wr,string(userJson))
-					}
-				}
-			}
+			fmt.Fprintln(wr, handlePostRequest(rd))
+			return
 		}
 	})
 
@@ -104,6 +64,56 @@ func runServer(){
 
 	if err!=nil {
 		log.Fatal(err)
+	}
+}
+
+func handleGetRequest(rd *http.Request) string {
+	user := &userInfo{}
+
+	if nameValue,nameOk := rd.URL.Query()["name"]; nameOk {
+		user.Name= nameValue[0]
+	}
+
+	if ageValue,ageOk := rd.URL.Query()["age"]; ageOk {
+		if len(ageValue[0])>0 {
+			ageInt,err := strconv.ParseInt(ageValue[0],10,64)
+			if err==nil {
+				user.Age = int(ageInt)
+			}
+		}
+	}
+	//struct to json
+	userJson,err := json.MarshalIndent(user,"","  ")
+	if err!=nil {
+		log.Fatal("Error found in struct to json conversion::",err)
+		return ""
+	}else {
+		return string(userJson)
+	}
+}
+
+func handlePostRequest(rd *http.Request) string {
+
+	var user userInfo
+	defer rd.Body.Close()
+	info,err := ioutil.ReadAll(rd.Body)
+	if err!=nil {
+		log.Fatal("Error found in json reading::", err)
+		return ""
+	}else {
+		//json to struct
+		err := json.Unmarshal(info,&user)
+		if err!=nil {
+			log.Fatal("Error found in json to struct conversion::",err)
+			return ""
+		} else {
+			//struct to json
+			userJson,err := json.MarshalIndent(user,"","  ")
+			if err!=nil {
+				log.Fatal("Error found in struct to json conversion::", err)
+			}
+			return string(userJson)
+		}
 	}
 }
 
