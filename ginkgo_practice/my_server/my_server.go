@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
+	"encoding/base64"
 )
 
 type userInfo struct {
@@ -17,23 +19,30 @@ type userInfo struct {
 
 var server *http.Server
 
-func RunServer(port string) {
+func RunServer(port string, auth bool) {
 	server = &http.Server{
 		Addr: ":" + port,
 	}
 
-	http.HandleFunc("/hello", func(wr http.ResponseWriter, rd *http.Request) {
+	printStatus(port,auth)
 
-		if rd.Method == "GET" {
+	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
 
-			fmt.Fprintln(wr, handleGetRequest(rd))
-			return
-
-		} else if rd.Method == "POST" {
-
-			fmt.Fprintln(wr, handlePostRequest(rd))
+		if auth&&!basicAuth(w, r) {
 			return
 		}
+
+		if r.Method == "GET" {
+
+			fmt.Fprintln(w, handleGetRequest(r))
+			return
+
+		} else if r.Method == "POST" {
+
+			fmt.Fprintln(w, handlePostRequest(r))
+			return
+		}
+
 	})
 
 	err := server.ListenAndServe()
@@ -43,35 +52,41 @@ func RunServer(port string) {
 	}
 }
 
-func RunEchoServer(port string) {
+func RunEchoServer(port string, auth bool) {
 	server = &http.Server{
 		Addr: ":" + port,
 	}
 
-	http.HandleFunc("/hello", func(wr http.ResponseWriter, rd *http.Request) {
+	printStatus(port,auth)
 
-		if rd.Method == "GET" {
+	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
+
+		if auth&&!basicAuth(w, r) {
+			return
+		}
+
+		if r.Method == "GET" {
 
 			var user userInfo
 
-			err := json.Unmarshal([]byte(handleGetRequest(rd)), &user)
+			err := json.Unmarshal([]byte(handleGetRequest(r)), &user)
 			if err != nil {
 				log.Fatal("Error json to struct::", err)
 			} else {
-				fmt.Fprintln(wr, "Hello,", user.Name)
-				fmt.Fprintln(wr, "Your age is: ", user.Age)
+				fmt.Fprintln(w, "Hello,", user.Name)
+				fmt.Fprintln(w, "Your age is: ", user.Age)
 			}
 
-		} else if rd.Method == "POST" {
+		} else if r.Method == "POST" {
 
 			var user userInfo
 
-			err := json.Unmarshal([]byte(handlePostRequest(rd)), &user)
+			err := json.Unmarshal([]byte(handlePostRequest(r)), &user)
 			if err != nil {
 				log.Fatal("Error json to struct::", err)
 			} else {
-				fmt.Fprintln(wr, "Hello,", user.Name)
-				fmt.Fprintln(wr, "Your age is: ", user.Age)
+				fmt.Fprintln(w, "Hello,", user.Name)
+				fmt.Fprintln(w, "Your age is: ", user.Age)
 			}
 		}
 	})
@@ -89,6 +104,48 @@ func ServerShutdown() {
 
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func printStatus(port string, auth bool) {
+	fmt.Println("Server is running in Port:",port)
+	if auth {
+		fmt.Println("Http authentication enabled")
+	} else {
+		fmt.Println("Http authentication disabled")
+	}
+}
+
+func basicAuth(w http.ResponseWriter, r *http.Request) bool {
+
+	if r.Header.Get("Authorization")=="" {
+		w.Header().Add("WWW-Authenticate", `Basic realm="For access"`)
+		http.Error(w,"Authorization required",401)
+		return false
+	} else {
+
+		loginInfo := strings.Split(r.Header.Get("Authorization")," ")
+		if len(loginInfo)!=2 {
+			http.Error(w,"Not authorized",401)
+			return false
+		} else {
+			info, err := base64.StdEncoding.DecodeString(loginInfo[1])
+			if err!=nil {
+				http.Error(w,err.Error(),401)
+				return  false
+			}else {
+				infoPair := strings.Split(string(info),":")
+				if len(infoPair)!=2 {
+					http.Error(w,"Not authorized",401)
+					return false
+				} else if infoPair[0]!="nahid"|| infoPair[1]!="1234" {
+					http.Error(w,"invalid username or password",401)
+					return false
+				} else {
+					return true
+				}
+			}
+		}
 	}
 }
 

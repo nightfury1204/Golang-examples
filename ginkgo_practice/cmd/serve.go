@@ -13,7 +13,7 @@ var serveCmd = &cobra.Command{
 	Long:  "This command will start the server on specified port(default port is 8080) and output name,age in json formate",
 	Run: func(cmd *cobra.Command, args []string) {
 		//fmt.Printf("Server is starting on port: %v....\n",port)
-		my_server.RunServer(port)
+		my_server.RunServer(port,auth)
 	},
 }
 

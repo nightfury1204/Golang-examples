@@ -9,6 +9,7 @@ import (
 )
 
 var port string
+var auth bool
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -39,5 +40,6 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	RootCmd.PersistentFlags().StringVar(&port, "port", "8080", "assign port number(default port is 8080)")
+	RootCmd.PersistentFlags().BoolVar(&auth, "auth", false, "http authorization require( default no authorization required)")
 }
 

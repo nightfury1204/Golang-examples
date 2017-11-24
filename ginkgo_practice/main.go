@@ -14,7 +14,7 @@
 
 package main
 
-import "Golang-examples/cobraPrac/cmd"
+import "Golang-examples/ginkgo_practice/cmd"
 
 func main() {
 	cmd.Execute()

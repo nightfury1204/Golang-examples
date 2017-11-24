@@ -16,7 +16,7 @@ func TestGinkgoPractice(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-	go my_server.RunServer("8080")
+	go my_server.RunServer("8080",false)
     for {
 		if _, err := http.Get("http://127.0.0.1:8080/hello"); err == nil {
 			break
