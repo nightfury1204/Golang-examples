@@ -1,0 +1,18 @@
+package: Golang-examples/k8s-client-go
+import:
+- package: github.com/spf13/cobra
+- package: k8s.io/api
+  subpackages:
+  - apps/v1beta2
+  - core/v1
+- package: k8s.io/apimachinery
+  subpackages:
+  - pkg/apis/meta/v1
+  - pkg/util/intstr
+- package: k8s.io/client-go
+  subpackages:
+  - kubernetes
+  - kubernetes/typed/apps/v1beta2
+  - kubernetes/typed/core/v1
+  - tools/clientcmd
+  - util/homedir
