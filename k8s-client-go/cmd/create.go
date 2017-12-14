@@ -60,20 +60,12 @@ var CreateCmd = &cobra.Command{
 		}
 		log.Printf("Service created : %q\n",service.GetObjectMeta().GetName())
 
-		nodes, err := clientset.CoreV1().Nodes().List(metav1.ListOptions{})
+		node, err := clientset.CoreV1().Nodes().Get("minikube",metav1.GetOptions{})
 		if err!=nil {
 			log.Fatal(err)
 		}
-		if nodes!=nil {
-			for _, node := range nodes.Items {
-				if node.Name == "minikube" {
-					fmt.Println("Access Url:")
-					fmt.Printf("%v:%v\n",node.Status.Addresses[0].Address,service.Spec.Ports[0].NodePort)
-				}
-			}
-		}else {
-			log.Fatal("No nodes found!!")
-		}
+		fmt.Println("Access Url:")
+		fmt.Printf("%v:%v\n",node.Status.Addresses[0].Address,service.Spec.Ports[0].NodePort)
 	},
 }
 
