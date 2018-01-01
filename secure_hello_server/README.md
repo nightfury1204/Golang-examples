@@ -15,7 +15,8 @@ go run main.go serve --mutual=false
 ```
 
 ####Client
-```apple js
+
+```
 #run https client in client directory
 go run main.go
 
