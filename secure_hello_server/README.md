@@ -1,23 +1,23 @@
-#Secure hello server
+# Secure hello server
 
 ```
-go run main.go --help
+$ go run main.go --help
 
 #for generating certificate
-go run main.go initcert
+$ go run main.go initcert
 
 #run https server and it doesn't require client certificate
-go run main.go serve --mutual=false
+$ go run main.go serve --mutual=false
 
 #run https server and require client certificate
-go run main.go serve --mutual=false
+$ go run main.go serve --mutual=false
 
 ```
 
-####Client
+#### Client
 
 ```
 #run https client in client directory
-go run main.go
+$ go run main.go
 
 ```
