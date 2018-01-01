@@ -5,3 +5,4 @@ import:
   subpackages:
   - util/cert
   - util/homedir
+- package: github.com/bmizerany/pat
