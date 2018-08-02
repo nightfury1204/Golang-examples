@@ -38,7 +38,7 @@ var initcertCmd = &cobra.Command{
 		createDir(dir)
 
 		cfg := cert.Config{
-			CommonName: "ca",
+			CommonName: "10.0.2.2",
 		}
 
 		caKey, err := cert.NewPrivateKey()

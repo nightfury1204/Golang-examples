@@ -38,6 +38,6 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	RootCmd.PersistentFlags().StringVar(&port, "port", "8080", "assign port number(default port is 8080)")
+	RootCmd.PersistentFlags().StringVar(&port, "server.port", "8080", "assign port number(default port is 8080)")
 }
 
