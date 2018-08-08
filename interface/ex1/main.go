@@ -1,4 +1,4 @@
-package main
+package ex1
 
 import "fmt"
 
@@ -27,6 +27,7 @@ func (a *A) Hello() {
 }
 
 type B struct {
+	// 'a AInterface' will be failed to implement BInterface
 	AInterface
 	goodBye string
 }
