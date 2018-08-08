@@ -13,6 +13,10 @@ func main() {
 	select {
 	case <-time.After(time.Second * 10):
 		close(shutdown)
+	case <-time.After(time.Second*2):
+		print()
+	case <-shutdown:
+
 	}
 }
 
