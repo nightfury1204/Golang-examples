@@ -60,6 +60,7 @@ var initcertCmd = &cobra.Command{
 			CommonName: "server",
 			AltNames: cert.AltNames{
 				IPs: []net.IP{net.ParseIP("127.0.0.1")},
+				DNSNames: []string{"localhost", "example.com"},
 			},
 			Usages: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		}
